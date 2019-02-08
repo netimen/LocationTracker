@@ -18,9 +18,9 @@ class NetworkManager(private val settingsManager: SettingsManager) {
         .build()
     private val service = retrofit.create(NetworkApi::class.java)
 
-    fun sendLocation(location: Location, onSuccess: (NetworkResponse) -> Unit = {}) {
-        Logger.message(logHeader(location))
-        service.sendLocation(settingsManager.uuid, location.lat, location.lng)
+    fun sendLocation(location: Location, batteryLevel: Int, onSuccess: (NetworkResponse) -> Unit = {}) {
+        Logger.message("${logHeader(location)} battery: $batteryLevel")
+        service.sendLocation(settingsManager.uuid, location.lat, location.lng, batteryLevel)
             .enqueue(object : Callback<NetworkResponse> {
                 override fun onFailure(call: Call<NetworkResponse>, t: Throwable) {
                     Logger.error("${logHeader(location)}, error: ", t)
@@ -48,5 +48,5 @@ data class NetworkResponse(val success: Int, val timeoutS: Int)
 
 private interface NetworkApi {
     @GET("location")
-    fun sendLocation(@Query("id") uuid: String, @Query("lat") lat: Double, @Query("lng") lng: Double): Call<NetworkResponse>
+    fun sendLocation(@Query("id") uuid: String, @Query("lat") lat: Float, @Query("lng") lng: Float, @Query("level") batteryLevel: Int): Call<NetworkResponse>
 }

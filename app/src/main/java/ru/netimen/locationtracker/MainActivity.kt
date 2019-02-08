@@ -12,8 +12,9 @@ class MainActivity : AppCompatActivity() {
     private val timeoutView by lazy { findViewById<TextView>(R.id.timeout) }
     private val locationView by lazy { findViewById<TextView>(R.id.location) }
 
-    private val settingsManager by lazy { SettingsManager(this.applicationContext) }
+    private val settingsManager by lazy { SettingsManager(applicationContext) }
     private val networkManager by lazy { NetworkManager(settingsManager) }
+    private val batteryHelper by lazy { BatteryHelper(applicationContext) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,12 +29,12 @@ class MainActivity : AppCompatActivity() {
                 settingsManager.timeoutS = Integer.valueOf(s.toString())
             }
         })
-        LocationManager(this.applicationContext).startListen(10L) {
+        LocationManager(this.applicationContext).startListen(settingsManager.timeoutMs) {
             locationView.text = it.toString()
-            networkManager.sendLocation(it)
+            networkManager.sendLocation(it, batteryHelper.batteryLevel)
         }
     }
 }
 
-// CUR change timeout, autostart, service, store last success, fabric, battery
+// CUR change timeout, autostart, service, store last success, fabric
 

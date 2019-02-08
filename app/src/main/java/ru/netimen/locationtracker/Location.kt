@@ -9,7 +9,7 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import java.text.SimpleDateFormat
 
-class Location(val lat: Double, val lng: Double, val timeMs: Long) {
+class Location(val lat: Float, val lng: Float, val timeMs: Long) {
     companion object {
         @SuppressLint("SimpleDateFormat")
         private val DATE_FORMATTER = SimpleDateFormat("hh:mm:ss")
@@ -25,15 +25,15 @@ class LocationManager(context: Context) {
         )
     }
 
-    fun startListen(intervalMs: Long, listener: (Location) -> Unit) {
+    fun startListen(intervalMs: Int, listener: (Location) -> Unit) {
         locationApi.requestLocationUpdates( // CUR cache last location
-            LocationRequest.create().setFastestInterval(intervalMs).setInterval(intervalMs),
+            LocationRequest.create().setFastestInterval(intervalMs.toLong()).setInterval(intervalMs.toLong()),
             object : LocationCallback() {
                 override fun onLocationResult(result: LocationResult) {
                     listener(
                         Location(
-                            result.lastLocation.latitude,
-                            result.lastLocation.longitude,
+                            result.lastLocation.latitude.toFloat(),
+                            result.lastLocation.longitude.toFloat(),
                             result.lastLocation.time
                         )
                     )
