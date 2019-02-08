@@ -18,6 +18,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Logger.setup(applicationContext)
         setContentView(R.layout.activity_main)
         uuidView.text = settingsManager.uuid
         timeoutView.text = settingsManager.timeoutS.toString()
@@ -26,7 +27,7 @@ class MainActivity : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                settingsManager.timeoutS = Integer.valueOf(s.toString())
+                settingsManager.timeoutS = if (s.isNotBlank()) Integer.valueOf(s.toString()) else 1
             }
         })
         LocationManager(this.applicationContext).startListen(settingsManager.timeoutMs) {
@@ -36,5 +37,5 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-// CUR change timeout, autostart, service, store last success, fabric
+// CUR change timeout, autostart, service, store last success, find crashes
 
