@@ -6,6 +6,15 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:padding">@dimen/margin</item>
+    </style>
+
+    <style name="Text">
+        <item name="android:textSize">16sp</item>
+        <item name="android:layout_marginBottom">@dimen/margin</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:maxLines">1</item>
     </style>
 
 </resources>
