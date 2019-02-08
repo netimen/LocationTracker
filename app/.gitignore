@@ -1,0 +1,11 @@
+.gradle
+.idea
+build/
+generatedJava/
+local.properties
+*.iml
+.DS_Store
+/.mainframer
+*~
+/captures
+*.pyc
