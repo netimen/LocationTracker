@@ -2,8 +2,6 @@ package ru.netimen.locationtracker
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.text.Editable
-import android.text.TextWatcher
 import android.widget.TextView
 
 class MainActivity : AppCompatActivity() {
@@ -12,30 +10,25 @@ class MainActivity : AppCompatActivity() {
     private val timeoutView by lazy { findViewById<TextView>(R.id.timeout) }
     private val locationView by lazy { findViewById<TextView>(R.id.location) }
 
-    private val settingsManager by lazy { SettingsManager(applicationContext) }
-    private val networkManager by lazy { NetworkManager(settingsManager) }
-    private val batteryHelper by lazy { BatteryHelper(applicationContext) }
+    private val component by lazy { DaggerAppComponent.builder().context(applicationContext).build() }
+    private val controller by lazy { component.controller() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Logger.setup(applicationContext)
         setContentView(R.layout.activity_main)
-        uuidView.text = settingsManager.uuid
-        timeoutView.text = settingsManager.timeoutS.toString()
-        timeoutView.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) = Unit
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
-
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                settingsManager.timeoutS = if (s.isNotBlank()) Integer.valueOf(s.toString()) else 1
-            }
-        })
-        LocationManager(this.applicationContext).startListen(settingsManager.timeoutMs) {
-            locationView.text = it.toString()
-            networkManager.sendLocation(it, batteryHelper.batteryLevel)
+        uuidView.text = controller.uuid
+        timeoutView.onTextChanged {
+            controller.changeTimeout(if (it.isNotBlank()) Integer.valueOf(it) else 1)
         }
+        controller.onTimeoutChanged = { timeoutView.text = it.toString() }
+        controller.onLastLocationChanged = { if (it != null) locationView.text = it.toString() }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        controller.start()
     }
 }
 
-// CUR change timeout, autostart, service, store last success, find crashes
+// CUR autostart,
 

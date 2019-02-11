@@ -20,6 +20,6 @@
     <TextView
             style="@style/Text"
             android:id="@+id/location"
-            tools:text="65 41 12:38:00"/>
+            android:text="@string/no_location_sent"/>
 
 </LinearLayout>

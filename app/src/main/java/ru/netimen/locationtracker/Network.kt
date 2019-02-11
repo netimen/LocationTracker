@@ -9,9 +9,12 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
 import java.io.IOException
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @MainThread
-class NetworkManager(private val settingsManager: SettingsManager) {
+@Singleton
+class NetworkManager @Inject constructor(private val settingsManager: SettingsManager, private val logger: Logger) {
     private val retrofit = Retrofit.Builder()
         .baseUrl("https://ctsp.cts-group.ru")
         .addConverterFactory(GsonConverterFactory.create())
@@ -19,23 +22,20 @@ class NetworkManager(private val settingsManager: SettingsManager) {
     private val service = retrofit.create(NetworkApi::class.java)
 
     fun sendLocation(location: Location, batteryLevel: Int, onSuccess: (NetworkResponse) -> Unit = {}) {
-        Logger.message("${logHeader(location)} battery: $batteryLevel")
+        logger.message("${logHeader(location)} battery: $batteryLevel")
         service.sendLocation(settingsManager.uuid, location.lat, location.lng, batteryLevel)
             .enqueue(object : Callback<NetworkResponse> {
                 override fun onFailure(call: Call<NetworkResponse>, t: Throwable) {
-                    Logger.error("${logHeader(location)}, error: ", t)
+                    logger.error("${logHeader(location)}, error: ", t)
                 }
 
                 override fun onResponse(call: Call<NetworkResponse>, response: Response<NetworkResponse>) {
                     val result = response.body()
                     if (response.isSuccessful && result != null) {
-                        Logger.message("${logHeader(location)}, result: $result")
+                        logger.message("${logHeader(location)}, result: $result")
                         onSuccess(result)
                     } else {
-                        Logger.error(
-                            "$${logHeader(location)}, error: ",
-                            IOException(response.message())
-                        )
+                        logger.error("$${logHeader(location)}, error: ", IOException(response.message()))
                     }
                 }
             })
@@ -44,7 +44,7 @@ class NetworkManager(private val settingsManager: SettingsManager) {
     private fun logHeader(location: Location) = "sending <$location>"
 }
 
-data class NetworkResponse(val success: Int, val timeoutS: Int)
+data class NetworkResponse(val success: Int, val timeout: Int)
 
 private interface NetworkApi {
     @GET("location")
