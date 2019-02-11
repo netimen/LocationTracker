@@ -33,7 +33,7 @@ class LocationManager @Inject constructor(context: Context) {
     private var locationCallback: LocationCallback? = null
 
     fun startListen(intervalMs: Int, listener: (Location) -> Unit) {
-        locationCallback?.let { locationApi.removeLocationUpdates(locationCallback) }
+        stopListen()
 
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) = listener(Location(result.lastLocation))
@@ -41,6 +41,8 @@ class LocationManager @Inject constructor(context: Context) {
 
         locationApi.requestLocationUpdates(createLocationRequest(intervalMs), locationCallback, Looper.getMainLooper())
     }
+
+    fun stopListen() = locationCallback?.let { locationApi.removeLocationUpdates(locationCallback) }
 
     private fun createLocationRequest(intervalMs: Int) =
         LocationRequest.create().setFastestInterval(intervalMs.toLong()).setInterval(intervalMs.toLong())

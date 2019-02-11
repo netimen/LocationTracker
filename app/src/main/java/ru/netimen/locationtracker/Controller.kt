@@ -46,4 +46,9 @@ class Controller @Inject constructor(
             }
         }
     }
+
+    fun stop() {
+        logger.message("STOP")
+        locationManager.stopListen()
+    }
 }

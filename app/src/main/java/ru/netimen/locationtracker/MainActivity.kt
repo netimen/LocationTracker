@@ -16,10 +16,12 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         uuidView.text = controller.uuid
         timeoutView.onTextChanged {
             controller.changeTimeout(if (it.isNotBlank()) Integer.valueOf(it) else 1)
         }
+
         controller.onTimeoutChanged = { timeoutView.text = it.toString() }
         controller.onLastLocationChanged = { if (it != null) locationView.text = it.toString() }
     }
@@ -28,7 +30,10 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         controller.start()
     }
-}
 
-// CUR autostart,
+    override fun onStop() {
+        super.onStop()
+        controller.stop()
+    }
+}
 
